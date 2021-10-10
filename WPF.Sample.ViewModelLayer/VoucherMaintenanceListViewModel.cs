@@ -15,6 +15,7 @@ namespace WPF.Sample.ViewModelLayer
     public class VoucherMaintenanceListViewModel : ViewModelAddEditDeleteBase
     {
         private ObservableCollection<VoucherMaster> _vouchers = new ObservableCollection<VoucherMaster>();
+        private bool _canEdit;
 
         public ObservableCollection<VoucherMaster> Vouchers
         {

@@ -1,7 +1,7 @@
 ﻿namespace Common.Library
 {
     /// <summary>
-    /// This class is responsible for receiving and sending messages to classes registered to receive those messages
+    ///     This class is responsible for receiving and sending messages to classes registered to receive those messages
     /// </summary>
     public class MessageBrokerMessages
     {

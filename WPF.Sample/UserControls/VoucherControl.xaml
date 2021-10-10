@@ -44,10 +44,17 @@
                     <Image Source="pack://application:,,,/WPF.Common;component/Images/Search_Black.png" Style="{StaticResource toolbarImage}" />
                 </Button>
             </ToolBar>
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.RowSpan="2">
+            <StackPanel Name="MainPanel" Orientation="Horizontal" Grid.Row="1" Grid.RowSpan="2">
                 <local:VoucherListControl x:Name="listControl" DataContext="{StaticResource viewModel}"/>
-                <local:VoucherDetailControl x:Name="detailControl" IsEnabled="{Binding Path=IsDetailEnabled}" DataContext="{StaticResource viewModel}" />
             </StackPanel>
+            <Popup Grid.Row="1" StaysOpen="True" AllowsTransparency="True" PlacementTarget="{Binding ElementName=MainPanel}" Placement="Center" IsOpen="{Binding IsOpen}">
+                <Border BorderThickness="1" Background="Silver">
+                    <StackPanel Background="White" VerticalAlignment="Center">
+                        <local:VoucherDetailControl Background="White" Height="600" Width="800" x:Name="detailControl" IsEnabled="{Binding Path=IsDetailEnabled}" DataContext="{StaticResource viewModel}" />
+                    </StackPanel>
+                </Border>
+            </Popup>
+
         </Grid>
 
     </Border>

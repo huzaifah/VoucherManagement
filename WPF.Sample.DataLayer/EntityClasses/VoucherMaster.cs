@@ -20,8 +20,9 @@ namespace WPF.Sample.DataLayer.EntityClasses
         private string _expenseType;
         private string _chequeNo = string.Empty;
         private decimal _totalAmount;
+        private string _amountInText = string.Empty;
         private ICollection<VoucherPaymentDetails> _paymentDetails = new List<VoucherPaymentDetails>();
-        
+
         [Required]
         [Key]
         public int VoucherMasterId
@@ -141,6 +142,74 @@ namespace WPF.Sample.DataLayer.EntityClasses
                 _totalAmount = value;
                 RaisePropertyChanged("TotalAmount");
             }
+        }
+
+        [NotMapped]
+        public string AmountInText
+        {
+            get
+            {
+                var ringgit = (int)_totalAmount;
+                var cent = (int)Math.Round((_totalAmount - ringgit) * 100);
+
+                _amountInText = NumberToWords(ringgit);
+
+                if (cent > 0)
+                    _amountInText = _amountInText.Trim() + " dan " + NumberToWords(cent) + " sen";
+
+                return _amountInText;
+            }
+            set
+            {
+                _amountInText = value;
+                RaisePropertyChanged("AmountInText");
+            }
+        }
+
+        public static string NumberToWords(int number)
+        {
+            if (number == 0)
+                return "sifar";
+
+            if (number < 0)
+                return "negative " + NumberToWords(Math.Abs(number));
+
+            string words = "";
+
+            if ((number / 1000000) > 0)
+            {
+                words += NumberToWords(number / 1000000) + " juta ";
+                number %= 1000000;
+            }
+
+            if ((number / 1000) > 0)
+            {
+                words += NumberToWords(number / 1000) + " ribu ";
+                number %= 1000;
+            }
+
+            if ((number / 100) > 0)
+            {
+                words += NumberToWords(number / 100) + " ratus ";
+                number %= 100;
+            }
+
+            if (number > 0)
+            {
+                var unitsMap = new[] { "sifar", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "lapan", "sembilan", "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas", "tujuh belas", "lapan belas", "sembilan belas" };
+                var tensMap = new[] { "sifar", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "lapan puluh", "sembilan puluh" };
+
+                if (number < 20)
+                    words += unitsMap[number];
+                else
+                {
+                    words += tensMap[number / 10];
+                    if ((number % 10) > 0)
+                        words += " " + unitsMap[number % 10];
+                }
+            }
+
+            return words;
         }
     }
 

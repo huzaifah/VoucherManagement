@@ -10,7 +10,7 @@
              xmlns:globalization="clr-namespace:System.Globalization;assembly=mscorlib"
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
-             Width="650"
+             Margin="10 10 10 10"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -39,11 +39,11 @@
         <Label Grid.Row="1" Content="Recipient" />
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Entity.RecipientName}" />
         <Label Grid.Row="2" Content="Payment Date" />
-        <xctk:DateTimePicker Grid.Column="1" Grid.Row="2" Format="Custom" FormatString="dd/MM/yyyy" Name="dtDatePicker" TimePickerVisibility="Hidden" TextAlignment="Left" Value="{Binding Path=Entity.PaymentDate, Mode=TwoWay}" DefaultValue="{Binding Path=DateTime.Today}" />
+        <xctk:DateTimePicker Grid.Column="1" Grid.Row="2" Margin="5 1 5 1" Format="Custom" FormatString="dd/MM/yyyy" Name="dtDatePicker" TimePickerVisibility="Hidden" TextAlignment="Left" Value="{Binding Path=Entity.PaymentDate, Mode=TwoWay}" DefaultValue="{Binding Path=DateTime.Today}" />
         <Label Grid.Row="3" Content="Total Amount" />
         <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Path=Entity.TotalAmount, StringFormat='C'}" />
         <Label Grid.Row="4" Content="Payment Details" />
-        <Grid Grid.Column="1" Grid.Row="4" Height="300">
+        <Grid Grid.Column="1" Grid.Row="4" Height="200">
             <DataGrid Name="PaymentDetailsDataGrid" AlternatingRowBackground = "LightBlue" CanUserAddRows="True" SelectionMode="Single" CanUserDeleteRows="True"
                       AlternationCount = "2" AutoGenerateColumns = "False" ItemsSource="{Binding Entity.PaymentDetails, Mode=TwoWay}">
                 <DataGrid.CellStyle>
@@ -53,8 +53,8 @@
                 </DataGrid.CellStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header = "No" Binding = "{Binding RowNo}" />
-                    <DataGridTextColumn Header = "Title" Binding = "{Binding Title}" Width="300" />
-                    <DataGridTextColumn Header = "Invoice No" Binding = "{Binding InvoiceNo}" />
+                    <DataGridTextColumn Header = "Title" Binding = "{Binding Title}" Width="400" />
+                    <DataGridTextColumn Header = "Invoice No" Binding = "{Binding InvoiceNo}" Width="100" />
                     <DataGridTextColumn Header = "Amount" Binding = "{Binding Amount, StringFormat='C'}" />
                 </DataGrid.Columns>
                 <DataGrid.InputBindings>
@@ -74,10 +74,11 @@
                                  Converter={StaticResource enumConverter},
                                  ConverterParameter=Cheque}">
             </RadioButton>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="6" Orientation="Horizontal" IsEnabled="{Binding ElementName=RadioButtonCheque, Path=IsChecked, TargetNullValue=false}">
-            <Label Content="Cheque No" />
-            <TextBox Text="{Binding Path=Entity.ChequeNo}" Width="150" />
+
+            <StackPanel Orientation="Horizontal" IsEnabled="{Binding ElementName=RadioButtonCheque, Path=IsChecked, TargetNullValue=false}">
+                <Label Content="Cheque No" />
+                <TextBox Text="{Binding Path=Entity.ChequeNo}" Width="150" />
+            </StackPanel>
         </StackPanel>
         <Label Grid.Row="7" Content="Expense Type" />
         <StackPanel Grid.Column="1" Grid.Row="7" Orientation="Horizontal">

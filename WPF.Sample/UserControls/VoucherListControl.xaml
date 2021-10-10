@@ -6,14 +6,14 @@
              xmlns:local="clr-namespace:WPF.Sample.UserControls"
              Loaded="UserControl_Loaded"
              mc:Ignorable="d" 
-             Width="Auto"
+             Width="1250"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600" VerticalAlignment="Top">
-        <ListView Name="lvVouchers" ItemsSource="{Binding Path=Vouchers}" SelectedItem="{Binding Path=Entity, Mode=OneWayToSource}">
+        <ListView Name="lvVouchers" Focusable="False" ItemsSource="{Binding Path=Vouchers}" SelectedItem="{Binding Path=Entity}" SelectionChanged="lvVouchers_SelectionChanged">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Edit">
+                    <GridViewColumn Header="Edit" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource toolbarButton}" Click="EditButton_Click" Tag="{Binding}" ToolTip="Edit Voucher">
@@ -22,22 +22,22 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Path=VoucherNo}">
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=VoucherNo}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="VoucherNo" Click="lvVoucherColumnHeader_Click">Voucher No</GridViewColumnHeader>
                     </GridViewColumn>
-                    <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Path=RecipientName}">
+                    <GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=RecipientName}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="RecipientName" Click="lvVoucherColumnHeader_Click">Recipient Name</GridViewColumnHeader>
                     </GridViewColumn>
                     <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Path=PaymentDate, StringFormat='dd/MM/yyyy'}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="PaymentDate" Click="lvVoucherColumnHeader_Click">Payment Date</GridViewColumnHeader>
                     </GridViewColumn>
-                    <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Path=TotalAmount, StringFormat='C'}">
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=TotalAmount, StringFormat='C'}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="TotalAmount" Click="lvVoucherColumnHeader_Click">Amount</GridViewColumnHeader>
                     </GridViewColumn>
-                    <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Path=ExpenseType}">
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=ExpenseType}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="ExpenseType" Click="lvVoucherColumnHeader_Click">Expense Type</GridViewColumnHeader>
                     </GridViewColumn>
-                    <GridViewColumn Header="Delete">
+                    <GridViewColumn Header="Delete" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource toolbarButton}" Click="DeleteButton_Click" Tag="{Binding}" ToolTip="Delete Voucher">
@@ -46,7 +46,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Print Voucher">
+                    <GridViewColumn Header="Print Voucher" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource toolbarButton}" Click="GenerateVoucherButton_Click" Tag="{Binding}" ToolTip="Print Voucher">

@@ -19,7 +19,7 @@ namespace WPF.Sample.ViewModelLayer
     public class VoucherMaintenanceDetailViewModel : VoucherMaintenanceListViewModel
     {
         private VoucherMaster _entity = new VoucherMaster();
-        private VoucherMaster _originalEntity = new VoucherMaster();
+        //private VoucherMaster _originalEntity = new VoucherMaster();
 
         public VoucherMaster Entity
         {
@@ -30,7 +30,7 @@ namespace WPF.Sample.ViewModelLayer
                 RaisePropertyChanged("Entity");
             }
         }
-        
+
         private ICommand _DeletePaymentDetailCommand;
         public ICommand DeletePaymentDetailCommand
         {
@@ -40,7 +40,7 @@ namespace WPF.Sample.ViewModelLayer
 
         public override void LoadVouchers()
         {
-            // Load all users  
+            // Load all vouchers  
             base.LoadVouchers();
 
             // Set default entity  
@@ -53,7 +53,7 @@ namespace WPF.Sample.ViewModelLayer
         public override void BeginEdit(bool isAddMode = false)
         {
             // Create a copy in case user wants undo their changes  
-            base.Clone<VoucherMaster>(Entity, _originalEntity);
+            //base.Clone<VoucherMaster>(Entity, _originalEntity);
 
             if (isAddMode)
             {
@@ -68,9 +68,9 @@ namespace WPF.Sample.ViewModelLayer
         public override void CancelEdit()
         {
             base.CancelEdit();
-
+            LoadVouchers();
             // Clone Original to Entity object so each RaisePropertyChanged event fires  
-            base.Clone<VoucherMaster>(_originalEntity, Entity);
+            //base.Clone<VoucherMaster>(_originalEntity, Entity);
         }
 
         public override bool Save()
@@ -138,12 +138,12 @@ namespace WPF.Sample.ViewModelLayer
                 ret = true;
 
                 // Set Original Entity equal to changed entity    
-                _originalEntity = Entity;
+                //_originalEntity = Entity;
 
                 // If new entity, add to view model Users collection    
                 if (IsAddMode)
                 {
-                    Vouchers.Add(Entity);    
+                    Vouchers.Add(Entity);
                 }
 
                 // Set mode back to normal display    
@@ -157,7 +157,6 @@ namespace WPF.Sample.ViewModelLayer
             catch (Exception ex)
             {
                 PublishException(ex);
-                throw;
             }
 
             return ret;
@@ -213,56 +212,68 @@ namespace WPF.Sample.ViewModelLayer
             catch (Exception ex)
             {
                 PublishException(ex);
-                throw;
             }
 
             return ret;
         }
 
-        public void GenerateInvoice()
+        public void GenerateVoucher()
         {
-            string path = System.IO.Path.Combine(Environment.CurrentDirectory, "App_Data");
-            string outputFolder = System.IO.Path.Combine(path, "Output");
-            
-            if (!Directory.Exists(outputFolder))
-                Directory.CreateDirectory(outputFolder);
-
-            string outputPath = System.IO.Path.Combine(outputFolder,
-                $"{Entity.VoucherNo.Replace('/','_')}-{DateTime.Now:dd-MM-yyyy_HH-mm-ss}.docx");
-
-            using (var document = DocX.Load(System.IO.Path.Combine(path, "Template.docx")))
+            try
             {
-                // Check if some of the replace patterns are used in the loaded document.
-                if (document.FindUniqueByPattern(@"<[\w \=]{4,}>", RegexOptions.IgnoreCase).Count > 0)
+                string path = System.IO.Path.Combine(Environment.CurrentDirectory, "App_Data");
+                string outputFolder = System.IO.Path.Combine(path, "Output");
+
+                if (!Directory.Exists(outputFolder))
+                    Directory.CreateDirectory(outputFolder);
+
+                string outputPath = System.IO.Path.Combine(outputFolder,
+                    $"{Entity.VoucherNo.Replace('/', '_')}-{DateTime.Now:dd-MM-yyyy_HH-mm-ss}.docx");
+
+                using (var document = DocX.Load(System.IO.Path.Combine(path, "Template.docx")))
                 {
-                    // Do the replacement of all the found tags and with green bold strings.
-                    document.ReplaceText("<(.*?)>", ReplaceTextInTemplate, false, RegexOptions.IgnoreCase, new Formatting() { Bold = true, FontColor = System.Drawing.Color.Blue, Size = 12 });
-                    
-                    var paymentDetailsTable = document.Tables.FirstOrDefault(t => t.TableCaption == "PAYMENT_LIST");
-                    if (paymentDetailsTable == null)
+                    // Check if some of the replace patterns are used in the loaded document.
+                    if (document.FindUniqueByPattern(@"<[\w \=]{4,}>", RegexOptions.IgnoreCase).Count > 0)
                     {
-                        Console.WriteLine("\tError, couldn't find table with caption PAYMENT_LIST in current document.");
-                    }
-                    else
-                    {
-                        if (paymentDetailsTable.RowCount > 1)
+                        // Do the replacement of all the found tags and with green bold strings.
+                        document.ReplaceText("<(.*?)>", ReplaceTextInTemplate, false, RegexOptions.IgnoreCase, new Formatting() { Bold = true, FontColor = System.Drawing.Color.Blue, Size = 11 });
+
+                        var paymentDetailsTable = document.Tables.FirstOrDefault(t => t.TableCaption == "PAYMENT_LIST");
+                        if (paymentDetailsTable == null)
                         {
-                            // Get the row pattern of the second row.
-                            var rowPattern = paymentDetailsTable.Rows[1];
-
-                            AddItemToTable(paymentDetailsTable, rowPattern);
-                            // Remove the pattern row.
-                            rowPattern.Remove();
+                            Console.WriteLine("\tError, couldn't find table with caption PAYMENT_LIST in current document.");
                         }
+                        else
+                        {
+                            if (paymentDetailsTable.RowCount > 1)
+                            {
+                                // Get the row pattern of the second row.
+                                var rowPattern = paymentDetailsTable.Rows[1];
+                                var totalRowPattern = paymentDetailsTable.Rows[2];
+                                AddItemToTable(paymentDetailsTable, rowPattern);
+
+                                var totalItem = paymentDetailsTable.InsertRow(totalRowPattern, paymentDetailsTable.RowCount - 1);
+                                totalItem.ReplaceText("%TOTAL_AMOUNT_1%", $"{Math.Floor(Entity.TotalAmount):N0}");
+                                totalItem.ReplaceText("%T_AMT_2%", $"{(int)(Entity.TotalAmount % 1 * 100):00}");
+
+                                // Remove the pattern row.
+                                rowPattern.Remove();
+                                totalRowPattern.Remove();
+                            }
+                        }
+
+                        // Save this document to disk.
+                        document.SaveAs(outputPath);
                     }
-
-                    // Save this document to disk.
-                    document.SaveAs(outputPath);
                 }
-            }
 
-            var wordProcess = new Process {StartInfo = {FileName = outputPath, UseShellExecute = true}};
-            wordProcess.Start();
+                var wordProcess = new Process { StartInfo = { FileName = outputPath, UseShellExecute = true } };
+                wordProcess.Start();
+            }
+            catch (Exception ex)
+            {
+                PublishException(ex);
+            }
         }
 
         private void AddItemToTable(Table table, Row rowPattern)
@@ -276,7 +287,7 @@ namespace WPF.Sample.ViewModelLayer
                 newItem.ReplaceText("%ROW_NO%", payment.RowNo.ToString());
                 newItem.ReplaceText("%PAYMENT_TITLE%", payment.Title.ToUpper());
                 newItem.ReplaceText("%INVOICE_NO%", payment.InvoiceNo.ToUpper());
-                newItem.ReplaceText("%AMOUNT_1%", $"{payment.Amount:N0}");
+                newItem.ReplaceText("%AMOUNT_1%", $"{Math.Floor(payment.Amount):N0}");
                 newItem.ReplaceText("%AMT_2%", $"{(int)(payment.Amount % 1 * 100):00}");
             }
         }
@@ -289,7 +300,8 @@ namespace WPF.Sample.ViewModelLayer
                 { "PAYMENT_DATE", Entity.PaymentDate.ToString("dd/MM/yyyy") },
                 { "RECIPIENT_NAME", Entity.RecipientName.ToUpper() },
                 { "PAYMENT_TYPE", Entity.PaymentType.ToUpper() == "CASH" ? "TUNAI" : $"CEK (No: {Entity.ChequeNo})" },
-                { "TOTAL_AMOUNT", $"RM {Entity.TotalAmount:N}" }
+                { "TOTAL_AMOUNT", $"RM {Entity.TotalAmount:N}" },
+                { "TOTAL_AMOUNT_IN_TEXT", Entity.AmountInText.Trim().ToUpper() }
             };
 
             if (replacePatterns.ContainsKey(stringToFind))

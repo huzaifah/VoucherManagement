@@ -15,7 +15,7 @@ namespace WPF.Sample.UserControls
     {
         private GridViewColumnHeader listViewSortCol = null;
         private SortAdorner listViewSortAdorner = null;
-
+        
         public VoucherListControl()
         {
             InitializeComponent();
@@ -45,6 +45,7 @@ namespace WPF.Sample.UserControls
 
             // Go into Edit mode  
             _viewModel.BeginEdit(false);
+            _viewModel.IsOpen = true;
         }
 
         private VoucherMaintenanceViewModel _viewModel;
@@ -57,7 +58,7 @@ namespace WPF.Sample.UserControls
         private void GenerateVoucherButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.Entity = (VoucherMaster)((Button)sender).Tag;
-            _viewModel.GenerateInvoice();
+            _viewModel.GenerateVoucher();
         }
 
         private void lvVoucherColumnHeader_Click(object sender, RoutedEventArgs e)
@@ -78,6 +79,12 @@ namespace WPF.Sample.UserControls
             listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
             AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
             lvVouchers.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+        }
+
+        private void lvVouchers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_viewModel.IsOpen)
+                e.AddedItems.Clear();
         }
     }
 

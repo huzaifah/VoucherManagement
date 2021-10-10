@@ -27,11 +27,14 @@ namespace WPF.Sample.UserControls
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CancelEdit();
+            _viewModel.IsOpen = false;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.Save();
+            if (!_viewModel.IsValidationVisible)
+                _viewModel.IsOpen = false;
         }
     }
 }
