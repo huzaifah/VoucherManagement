@@ -23,13 +23,10 @@
             </Grid.RowDefinitions>
 
             <ToolBar Grid.Row="0">
-                <Button Style="{StaticResource toolbarButton}" Click="AddButton_Click" IsEnabled="{Binding Path=IsListEnabled}" ToolTip="Add New Voucher">
+                <Button Style="{StaticResource toolbarButton}" Click="AddButton_Click" IsEnabled="True" ToolTip="Add New Voucher">
                     <Image Source="pack://application:,,,/WPF.Common;component/Images/Plus_Black.png" Style="{StaticResource toolbarImage}" />
                 </Button>
                 <Separator />
-                <Button Style="{StaticResource toolbarButton}" Click="EditButton_Click" IsEnabled="{Binding Path=IsListEnabled}" ToolTip="Edit Current Voucher">
-                    <Image Source="pack://application:,,,/WPF.Common;component/Images/Edit_Black.png" Style="{StaticResource toolbarImage}" />
-                </Button>
                 <Button Style="{StaticResource toolbarButton}" Click="DeleteButton_Click" IsEnabled="{Binding Path=IsListEnabled}" ToolTip="Delete Current Voucher">
                     <Image Source="pack://application:,,,/WPF.Common;component/Images/Trash_Black.png" Style="{StaticResource toolbarImage}" />
                 </Button>
@@ -47,10 +44,10 @@
             <StackPanel Name="MainPanel" Orientation="Horizontal" Grid.Row="1" Grid.RowSpan="2">
                 <local:VoucherListControl x:Name="listControl" DataContext="{StaticResource viewModel}"/>
             </StackPanel>
-            <Popup Grid.Row="1" StaysOpen="True" AllowsTransparency="True" PlacementTarget="{Binding ElementName=MainPanel}" Placement="Center" IsOpen="{Binding IsOpen}">
+            <Popup Grid.Row="1" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=MainPanel}" Placement="Center">
                 <Border BorderThickness="1" Background="Silver">
                     <StackPanel Background="White" VerticalAlignment="Center">
-                        <local:VoucherDetailControl Background="White" Height="600" Width="800" x:Name="detailControl" IsEnabled="{Binding Path=IsDetailEnabled}" DataContext="{StaticResource viewModel}" />
+                        <local:VoucherDetailControl Background="White" Height="700" Width="800" x:Name="detailControl" IsEnabled="{Binding Path=IsDetailEnabled}" DataContext="{StaticResource viewModel}" />
                     </StackPanel>
                 </Border>
             </Popup>

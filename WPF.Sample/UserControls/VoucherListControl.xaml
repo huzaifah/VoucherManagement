@@ -9,8 +9,7 @@
              Width="1250"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600" VerticalAlignment="Top">
-        <ListView Name="lvVouchers" Focusable="False" ItemsSource="{Binding Path=Vouchers}" SelectedItem="{Binding Path=Entity}" SelectionChanged="lvVouchers_SelectionChanged">
+        <ListView Name="lvVouchers" Height="675" MaxHeight="675" Focusable="False" ScrollViewer.VerticalScrollBarVisibility="Visible" ItemsSource="{Binding Path=Vouchers}" SelectionChanged="lvVouchers_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Edit" Width="Auto">
@@ -34,10 +33,19 @@
                     <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=TotalAmount, StringFormat='C'}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="TotalAmount" Click="lvVoucherColumnHeader_Click">Amount</GridViewColumnHeader>
                     </GridViewColumn>
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=CashChequeInfo}">
+                        <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="CashChequeInfo" Click="lvVoucherColumnHeader_Click">Cash / Cheque</GridViewColumnHeader>
+                    </GridViewColumn>
                     <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=ExpenseType}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="ExpenseType" Click="lvVoucherColumnHeader_Click">Expense Type</GridViewColumnHeader>
                     </GridViewColumn>
-                    <GridViewColumn Header="Delete" Width="Auto">
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=TabungType}">
+                        <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="TabungType" Click="lvVoucherColumnHeader_Click">Tabung</GridViewColumnHeader>
+                    </GridViewColumn>
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=Status}">
+                        <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="Status" Click="lvVoucherColumnHeader_Click">Status</GridViewColumnHeader>
+                    </GridViewColumn>
+                <GridViewColumn Header="Delete" Width="Auto">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Style="{StaticResource toolbarButton}" Click="DeleteButton_Click" Tag="{Binding}" ToolTip="Delete Voucher">
@@ -58,5 +66,4 @@
                 </GridView>
             </ListView.View>
         </ListView>
-    </ScrollViewer>
 </UserControl>

@@ -11,18 +11,18 @@
              mc:Ignorable="d" 
              Loaded="UserControl_Loaded"
              Margin="10 10 10 10"
-             d:DesignHeight="450" d:DesignWidth="800">
-
+             d:DesignHeight="700" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:EnumMatchToBooleanConverter x:Key="enumConverter" />
+        <converters:StringMatchToBooleanConverter x:Key="enumConverter" />
     </UserControl.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -39,11 +39,11 @@
         <Label Grid.Row="1" Content="Recipient" />
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Entity.RecipientName}" />
         <Label Grid.Row="2" Content="Payment Date" />
-        <xctk:DateTimePicker Grid.Column="1" Grid.Row="2" Margin="5 1 5 1" Format="Custom" FormatString="dd/MM/yyyy" Name="dtDatePicker" TimePickerVisibility="Hidden" TextAlignment="Left" Value="{Binding Path=Entity.PaymentDate, Mode=TwoWay}" DefaultValue="{Binding Path=DateTime.Today}" />
+        <xctk:DateTimePicker Grid.Column="1" Grid.Row="2" Margin="5 1 5 1" Format="Custom" FormatString="dd/MM/yyyy" Name="dtDatePicker" TimePickerVisibility="Hidden" TextAlignment="Left" Value="{Binding Path=Entity.PaymentDate, Mode=TwoWay}" />
         <Label Grid.Row="3" Content="Total Amount" />
         <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Path=Entity.TotalAmount, StringFormat='C'}" />
         <Label Grid.Row="4" Content="Payment Details" />
-        <Grid Grid.Column="1" Grid.Row="4" Height="200">
+        <Grid Margin="2,2,0,0" Grid.Column="1" Grid.Row="4" Height="200">
             <DataGrid Name="PaymentDetailsDataGrid" AlternatingRowBackground = "LightBlue" CanUserAddRows="True" SelectionMode="Single" CanUserDeleteRows="True"
                       AlternationCount = "2" AutoGenerateColumns = "False" ItemsSource="{Binding Entity.PaymentDetails, Mode=TwoWay}">
                 <DataGrid.CellStyle>
@@ -62,12 +62,17 @@
                 </DataGrid.InputBindings>
             </DataGrid>
         </Grid>
-        <Label Grid.Row="5" Content="Payment Type" />
+        <Label Grid.Row="5" Content="Payment Mode" />
         <StackPanel Grid.Column="1" Grid.Row="5" Orientation="Horizontal">
             <RadioButton GroupName="PaymentType" Content="Cash" Name="RadioButtonCash"
                          IsChecked="{Binding Path=Entity.PaymentType, Mode=TwoWay, 
                                  Converter={StaticResource enumConverter},
                                  ConverterParameter=Cash}">
+            </RadioButton>
+            <RadioButton GroupName="PaymentType" Content="Online Transfer" Name="RadioButtonOnline"
+                         IsChecked="{Binding Path=Entity.PaymentType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=OnlineTransfer}">
             </RadioButton>
             <RadioButton GroupName="PaymentType" Content="Cheque" Name="RadioButtonCheque"
                          IsChecked="{Binding Path=Entity.PaymentType, Mode=TwoWay, 
@@ -80,20 +85,60 @@
                 <TextBox Text="{Binding Path=Entity.ChequeNo}" Width="150" />
             </StackPanel>
         </StackPanel>
-        <Label Grid.Row="7" Content="Expense Type" />
-        <StackPanel Grid.Column="1" Grid.Row="7" Orientation="Horizontal">
+        <Label Grid.Row="6" Content="Expense Type" />
+        <StackPanel Grid.Column="1" Grid.Row="6" Orientation="Horizontal">
             <RadioButton GroupName="ExpenseType" Content="Belian" Name="RadioButtonBelian"
                          IsChecked="{Binding Path=Entity.ExpenseType, Mode=TwoWay, 
                                  Converter={StaticResource enumConverter},
                                  ConverterParameter=Belian}">
             </RadioButton>
-            <RadioButton GroupName="ExpenseType" Content="Belanja" Name="RadioButtonBelanja"
+            <RadioButton GroupName="ExpenseType" Content="Belanja (Pembekal)" Name="RadioButtonBelanja"
                          IsChecked="{Binding Path=Entity.ExpenseType, Mode=TwoWay, 
                                  Converter={StaticResource enumConverter},
-                                 ConverterParameter=Belanja}">
+                                 ConverterParameter='Belanja Pembekal'}">
+            </RadioButton>
+            <RadioButton GroupName="ExpenseType" Content="Belanja (Sumbangan)" Name="RadioButtonBelanjaSumbangan"
+                         IsChecked="{Binding Path=Entity.ExpenseType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter='Belanja Sumbangan'}">
+            </RadioButton>
+        </StackPanel>
+        <Label Grid.Row="7" Content="Tabung" />
+        <StackPanel Grid.Column="1" Grid.Row="7" Orientation="Horizontal">
+            <RadioButton GroupName="Tabung" Content="Tidak Berkenaan" Name="RadioButtonTiada"
+                         IsChecked="{Binding Path=Entity.TabungType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter='Tidak Berkenaan'}">
+            </RadioButton>
+            <RadioButton GroupName="Tabung" Content="Bangunan" Name="RadioButtonBangunan"
+                         IsChecked="{Binding Path=Entity.TabungType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=Bangunan}">
+            </RadioButton>
+            <RadioButton GroupName="Tabung" Content="Sumbangan" Name="RadioButtonSumbangan"
+                         IsChecked="{Binding Path=Entity.TabungType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=Sumbangan}">
+            </RadioButton>
+            <RadioButton GroupName="Tabung" Content="Kebajikan" Name="RadioButtonKebajikan"
+                         IsChecked="{Binding Path=Entity.TabungType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=Kebajikan}">
+            </RadioButton>
+            <RadioButton GroupName="Tabung" Content="Keceriaan" Name="RadioButtonKeceriaan"
+                         IsChecked="{Binding Path=Entity.TabungType, Mode=TwoWay, 
+                                 Converter={StaticResource enumConverter},
+                                 ConverterParameter=Keceriaan}">
             </RadioButton>
         </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="8" Orientation="Horizontal">
+            <Label Content="Nilai Sumbangan" />
+            <TextBox Text="{Binding Path=Entity.TabungAmount, StringFormat='C'}" Width="150" />
+        </StackPanel>
+        <Label Grid.Column="0" Grid.Row="9" Content="Status" />
+        <ComboBox Grid.Column="1" Grid.Row="9" Margin="10,10,0,0" Name="CbComboBoxStatus" ItemsSource="{Binding Path=Status}" SelectedItem="{Binding Path=Entity.Status}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="194">
+        </ComboBox>
+        <StackPanel Grid.Column="1" Grid.Row="10" Margin="10,10,0,0" Orientation="Horizontal">
             <Button IsCancel="True" Click="UndoButton_Click" IsEnabled="{Binding Path=IsDetailEnabled}" Style="{StaticResource toolbarButton}">
                 <StackPanel Orientation="Horizontal" Style="{StaticResource toolbarButtonStackPanel}">
                     <Image Source="pack://application:,,,/WPF.Common;component/Images/Undo_Black.png" Style="{StaticResource toolbarImage}" />
@@ -108,12 +153,10 @@
             </Button>
         </StackPanel>
         <!-- Validation Message Area -->
-        <ListBox Grid.Row="9" Grid.ColumnSpan="2"
+        <ListBox Grid.Row="11" Grid.ColumnSpan="2"
                  Style="{StaticResource validationArea}"
                  Visibility="{Binding IsValidationVisible, Converter={StaticResource visibilityConverter}}"
                  ItemsSource="{Binding ValidationMessages}"
                  DisplayMemberPath="Message" />
-
     </Grid>
-
 </UserControl>

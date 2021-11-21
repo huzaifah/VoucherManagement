@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -24,7 +25,8 @@ namespace WPF.Sample.UserControls
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             // Set selected item
-            _viewModel.Entity = (VoucherMaster)((Button)sender).Tag;
+            var selectedVoucher = (VoucherMaster)((Button)sender).Tag;
+            AssignEntity(selectedVoucher.VoucherMasterId);
 
             DeleteVoucher();
         }
@@ -38,14 +40,24 @@ namespace WPF.Sample.UserControls
             }
         }
 
+        private void AssignEntity(int voucherId)
+        {
+            _viewModel.Entity = _viewModel.Vouchers.Single(v => v.VoucherMasterId == voucherId);
+        }
+
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             // Set selected item
-            _viewModel.Entity = (VoucherMaster)((Button)sender).Tag;
+            var selectedVoucher = (VoucherMaster)((Button)sender).Tag;
+            AssignEntity(selectedVoucher.VoucherMasterId);
 
             // Go into Edit mode  
             _viewModel.BeginEdit(false);
-            _viewModel.IsOpen = true;
+            var voucherDetailWindow = new VoucherDetailWindow
+            {
+                DataContext = _viewModel
+            };
+            voucherDetailWindow.ShowDialog();
         }
 
         private VoucherMaintenanceViewModel _viewModel;
@@ -57,7 +69,9 @@ namespace WPF.Sample.UserControls
 
         private void GenerateVoucherButton_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.Entity = (VoucherMaster)((Button)sender).Tag;
+            var selectedVoucher = (VoucherMaster)((Button)sender).Tag;
+            AssignEntity(selectedVoucher.VoucherMasterId);
+
             _viewModel.GenerateVoucher();
         }
 
@@ -83,8 +97,6 @@ namespace WPF.Sample.UserControls
 
         private void lvVouchers_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (_viewModel.IsOpen)
-                e.AddedItems.Clear();
         }
     }
 

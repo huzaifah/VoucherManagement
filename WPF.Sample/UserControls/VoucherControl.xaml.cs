@@ -32,13 +32,11 @@ namespace WPF.Sample.UserControls
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.BeginEdit(true);
-            _viewModel.IsOpen = true;
-        }
-
-        private void EditButton_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.BeginEdit(false);
-            _viewModel.IsOpen = true;
+            var voucherDetailWindow = new VoucherDetailWindow
+            {
+                DataContext = _viewModel
+            };
+            voucherDetailWindow.ShowDialog();
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -49,14 +47,11 @@ namespace WPF.Sample.UserControls
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CancelEdit();
-            _viewModel.IsOpen = false;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.Save();
-            if (!_viewModel.IsValidationVisible)
-                _viewModel.IsOpen = false;
         }
 
         private void GenerateSummaryButton_Click(object sender, RoutedEventArgs e)

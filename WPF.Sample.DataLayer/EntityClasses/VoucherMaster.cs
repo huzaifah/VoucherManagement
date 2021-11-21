@@ -16,10 +16,13 @@ namespace WPF.Sample.DataLayer.EntityClasses
         private DateTime _paymentDate;
         private DateTime _createdOn = DateTime.Now;
         private string _createdBy = string.Empty;
+        private string _status = string.Empty;
         private string _paymentType;
         private string _expenseType;
+        private string _tabungType = "Tidak Berkenaan";
         private string _chequeNo = string.Empty;
         private decimal _totalAmount;
+        private decimal? _tabungAmount = 0;
         private string _amountInText = string.Empty;
         private ICollection<VoucherPaymentDetails> _paymentDetails = new List<VoucherPaymentDetails>();
 
@@ -42,6 +45,30 @@ namespace WPF.Sample.DataLayer.EntityClasses
             {
                 _voucherNo = value;
                 RaisePropertyChanged("VoucherNo");
+            }
+        }
+
+        [NotMapped]
+        public string CashChequeInfo
+        {
+            get
+            {
+                return GetPaymentTypeText();
+            }
+        }
+
+        private string GetPaymentTypeText()
+        {
+            switch (_paymentType)
+            {
+                case "Cash":
+                    return "Tunai";
+                case "OnlineTransfer":
+                    return "Online Transfer";
+                case "Cheque":
+                    return _chequeNo;
+                default:
+                    return string.Empty;
             }
         }
 
@@ -98,14 +125,28 @@ namespace WPF.Sample.DataLayer.EntityClasses
             }
         }
 
+        public string Status
+        {
+            get { return _status; }
+            set
+            {
+                _status = value;
+                RaisePropertyChanged("Status");
+            }
+        }
+
         [Required(ErrorMessage = "Payment Type must be filled in.")]
         public string PaymentType
         {
             get { return _paymentType; }
             set
             {
+                if (value == null)
+                    return;
+
                 _paymentType = value;
                 RaisePropertyChanged("PaymentType");
+                RaisePropertyChanged("CashChequeInfo");
             }
         }
 
@@ -115,6 +156,9 @@ namespace WPF.Sample.DataLayer.EntityClasses
             get { return _expenseType; }
             set
             {
+                if (value == null)
+                    return;
+
                 _expenseType = value;
                 RaisePropertyChanged("ExpenseType");
             }
@@ -127,6 +171,21 @@ namespace WPF.Sample.DataLayer.EntityClasses
             {
                 _chequeNo = value;
                 RaisePropertyChanged("ChequeNo");
+                RaisePropertyChanged("CashChequeInfo");
+            }
+        }
+
+        [Required(ErrorMessage = "Tabung must be filled in.")]
+        public string TabungType
+        {
+            get { return _tabungType; }
+            set
+            {
+                if (value == null)
+                    return;
+
+                _tabungType = value;
+                RaisePropertyChanged("TabungType");
             }
         }
 
@@ -141,6 +200,19 @@ namespace WPF.Sample.DataLayer.EntityClasses
             {
                 _totalAmount = value;
                 RaisePropertyChanged("TotalAmount");
+            }
+        }
+
+        public decimal? TabungAmount
+        {
+            get
+            {
+                return _tabungAmount;
+            }
+            set
+            {
+                _tabungAmount = value;
+                RaisePropertyChanged("TabungAmount");
             }
         }
 
@@ -211,11 +283,5 @@ namespace WPF.Sample.DataLayer.EntityClasses
 
             return words;
         }
-    }
-
-    public enum PaymentType
-    {
-        Cash,
-        Cheque
     }
 }

@@ -56,11 +56,14 @@ namespace WPF.Sample.ViewModelLayer
                     PaymentDate = v.PaymentDate.ToString("dd MMM yyyy"),
                     VoucherNo = v.VoucherNo,
                     ExpenseType = v.ExpenseType,
+                    Tabung = v.TabungType == "Tidak Berkenaan" ? "Tidak Berkenaan" : v.TabungType,
                     PaymentTitle = v.PaymentDetails.Any() ? v.PaymentDetails.First().Title : "",
                     Amount = v.TotalAmount.ToString("N2"),
                     RecipientName = v.RecipientName,
-                    PaymentType = v.PaymentType == PaymentType.Cash.ToString() ? "TUNAI" : "CEK",
-                    ChequeNo = v.PaymentType == PaymentType.Cheque.ToString() ? v.ChequeNo : ""
+                    PaymentType = GetPaymentTypeText(v.PaymentType),
+                    ChequeNo = v.PaymentType == "Cheque" ? v.ChequeNo : "",
+                    TabungAmount = v.TabungAmount?.ToString("N2"),
+                    Status = v.Status
                 });
 
                 string path = System.IO.Path.Combine(Environment.CurrentDirectory, "Summary");
@@ -77,6 +80,21 @@ namespace WPF.Sample.ViewModelLayer
             catch (Exception ex)
             {
                 ExceptionManager.Instance.Publish(ex);
+            }
+        }
+
+        private string GetPaymentTypeText(string paymentType)
+        {
+            switch (paymentType)
+            {
+                case "Cash":
+                    return "TUNAI";
+                case "OnlineTransfer":
+                    return "ONLINE TRANSFER";
+                case "Cheque":
+                    return "CEK";
+                default:
+                    return string.Empty;
             }
         }
 

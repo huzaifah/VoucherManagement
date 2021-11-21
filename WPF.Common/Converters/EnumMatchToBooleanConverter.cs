@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace WPF.Common.Converters
 {
-    public class EnumMatchToBooleanConverter : IValueConverter
+    public class StringMatchToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType,
             object parameter, CultureInfo culture)

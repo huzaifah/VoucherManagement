@@ -18,8 +18,7 @@ namespace WPF.Sample.ViewModelLayer
 {
     public class VoucherMaintenanceDetailViewModel : VoucherMaintenanceListViewModel
     {
-        private VoucherMaster _entity = new VoucherMaster();
-        //private VoucherMaster _originalEntity = new VoucherMaster();
+        private VoucherMaster _entity;
 
         public VoucherMaster Entity
         {
@@ -30,6 +29,13 @@ namespace WPF.Sample.ViewModelLayer
                 RaisePropertyChanged("Entity");
             }
         }
+
+        public List<string> Status => new List<string>
+        {
+            "",
+            "Tidak Berkenaan",
+            "Cek Batal"
+        };
 
         private ICommand _DeletePaymentDetailCommand;
         public ICommand DeletePaymentDetailCommand
@@ -52,14 +58,11 @@ namespace WPF.Sample.ViewModelLayer
 
         public override void BeginEdit(bool isAddMode = false)
         {
-            // Create a copy in case user wants undo their changes  
-            //base.Clone<VoucherMaster>(Entity, _originalEntity);
-
             if (isAddMode)
             {
                 Entity = new VoucherMaster();
                 Entity.PaymentDate = DateTime.Today;
-                Entity.VoucherNo = "NEWVOUCHER";
+                Entity.VoucherNo = "NEW VOUCHER";
             }
 
             base.BeginEdit(isAddMode);
@@ -69,8 +72,6 @@ namespace WPF.Sample.ViewModelLayer
         {
             base.CancelEdit();
             LoadVouchers();
-            // Clone Original to Entity object so each RaisePropertyChanged event fires  
-            //base.Clone<VoucherMaster>(_originalEntity, Entity);
         }
 
         public override bool Save()
@@ -88,6 +89,7 @@ namespace WPF.Sample.ViewModelLayer
                     Entity.CreatedOn = DateTime.Now;
                     Entity.CreatedBy = Environment.UserName;
                     Entity.VoucherNo = GenerateVoucherNo(Entity.PaymentDate.Month, Entity.PaymentDate.Year);
+                    Entity.Status = string.IsNullOrEmpty(Entity.Status) ? null : Entity.Status;
 
                     db.VoucherMaster.Add(Entity);
                 }
@@ -95,12 +97,22 @@ namespace WPF.Sample.ViewModelLayer
                 {
                     var voucher = db.VoucherMaster.SingleOrDefault(v => v.VoucherMasterId == Entity.VoucherMasterId);
 
+                    if (voucher == null)
+                        throw new ArgumentException($"Voucher {Entity.VoucherMasterId} not found");
+
                     voucher.TotalAmount = Entity.TotalAmount;
-                    voucher.ChequeNo = Entity.PaymentType == "Cash" ? null : Entity.ChequeNo;
+                    voucher.ChequeNo = Entity.PaymentType == "Cash" || Entity.PaymentType == "OnlineTransfer" ? null : Entity.ChequeNo;
                     voucher.PaymentType = Entity.PaymentType;
                     voucher.PaymentDate = Entity.PaymentDate;
                     voucher.RecipientName = Entity.RecipientName;
                     voucher.ExpenseType = Entity.ExpenseType;
+                    voucher.TabungType = Entity.TabungType;
+                    voucher.Status = string.IsNullOrEmpty(Entity.Status) ? null : Entity.Status;
+
+                    if (Entity.TabungAmount.HasValue)
+                        voucher.TabungAmount = Entity.TabungAmount.Value;
+                    else
+                        voucher.TabungAmount = null;
 
                     db.Entry(voucher).State = EntityState.Modified;
 
@@ -137,9 +149,6 @@ namespace WPF.Sample.ViewModelLayer
 
                 ret = true;
 
-                // Set Original Entity equal to changed entity    
-                //_originalEntity = Entity;
-
                 // If new entity, add to view model Users collection    
                 if (IsAddMode)
                 {
@@ -167,7 +176,7 @@ namespace WPF.Sample.ViewModelLayer
             bool ret = false;
             int index;
             SampleDbContext db;
-            VoucherMaster entity = new VoucherMaster();
+            VoucherMaster entity;
 
             try
             {
@@ -253,7 +262,7 @@ namespace WPF.Sample.ViewModelLayer
                                 AddItemToTable(paymentDetailsTable, rowPattern);
 
                                 var totalItem = paymentDetailsTable.InsertRow(totalRowPattern, paymentDetailsTable.RowCount - 1);
-                                totalItem.ReplaceText("%TOTAL_AMOUNT_1%", $"{Math.Floor(Entity.TotalAmount):N0}");
+                                totalItem.ReplaceText("%TOTAL_AMOUNT_1%", GetIntegerAmount(Entity.TotalAmount));
                                 totalItem.ReplaceText("%T_AMT_2%", $"{(int)(Entity.TotalAmount % 1 * 100):00}");
 
                                 // Remove the pattern row.
@@ -276,6 +285,14 @@ namespace WPF.Sample.ViewModelLayer
             }
         }
 
+        private string GetIntegerAmount(decimal amount)
+        {
+            var positiveAmount = Math.Abs(amount);
+            var integerAmount = Math.Floor(positiveAmount);
+
+            return amount < 0 ? $"-{integerAmount:N0}" : $"{integerAmount:N0}";
+        }
+
         private void AddItemToTable(Table table, Row rowPattern)
         {
             foreach (var payment in Entity.PaymentDetails)
@@ -287,7 +304,7 @@ namespace WPF.Sample.ViewModelLayer
                 newItem.ReplaceText("%ROW_NO%", payment.RowNo.ToString());
                 newItem.ReplaceText("%PAYMENT_TITLE%", payment.Title.ToUpper());
                 newItem.ReplaceText("%INVOICE_NO%", payment.InvoiceNo.ToUpper());
-                newItem.ReplaceText("%AMOUNT_1%", $"{Math.Floor(payment.Amount):N0}");
+                newItem.ReplaceText("%AMOUNT_1%", GetIntegerAmount(payment.Amount));
                 newItem.ReplaceText("%AMT_2%", $"{(int)(payment.Amount % 1 * 100):00}");
             }
         }
@@ -299,9 +316,10 @@ namespace WPF.Sample.ViewModelLayer
                 { "VOUCHER_NO", Entity.VoucherNo },
                 { "PAYMENT_DATE", Entity.PaymentDate.ToString("dd/MM/yyyy") },
                 { "RECIPIENT_NAME", Entity.RecipientName.ToUpper() },
-                { "PAYMENT_TYPE", Entity.PaymentType.ToUpper() == "CASH" ? "TUNAI" : $"CEK (No: {Entity.ChequeNo})" },
+                { "PAYMENT_TYPE", GetPaymentTypeText(Entity) },
                 { "TOTAL_AMOUNT", $"RM {Entity.TotalAmount:N}" },
-                { "TOTAL_AMOUNT_IN_TEXT", Entity.AmountInText.Trim().ToUpper() }
+                { "TOTAL_AMOUNT_IN_TEXT", Entity.AmountInText.Trim().ToUpper() },
+                { "TABUNG_TYPE", Entity.TabungType?.Trim() == "Tidak Berkenaan" ? "" : "TABUNG " + Entity.TabungType }
             };
 
             if (replacePatterns.ContainsKey(stringToFind))
@@ -309,6 +327,21 @@ namespace WPF.Sample.ViewModelLayer
                 return replacePatterns[stringToFind];
             }
             return stringToFind;
+        }
+
+        private string GetPaymentTypeText(VoucherMaster voucher)
+        {
+            switch (voucher.PaymentType)
+            {
+                case "Cash":
+                    return "TUNAI";
+                case "OnlineTransfer":
+                    return "ONLINE TRANSFER";
+                case "Cheque":
+                    return $"CEK (No: {Entity.ChequeNo})";
+                default:
+                    return string.Empty;
+            }
         }
 
         private string GenerateVoucherNo(int monthInNumeric, int year)
