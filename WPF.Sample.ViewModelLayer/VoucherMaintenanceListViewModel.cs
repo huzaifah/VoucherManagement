@@ -15,6 +15,7 @@ namespace WPF.Sample.ViewModelLayer
     public class VoucherMaintenanceListViewModel : ViewModelAddEditDeleteBase
     {
         private ObservableCollection<VoucherMaster> _vouchers = new ObservableCollection<VoucherMaster>();
+        private ObservableCollection<string> _suppliers = new ObservableCollection<string>();
         private bool _canEdit;
 
         public ObservableCollection<VoucherMaster> Vouchers
@@ -27,6 +28,16 @@ namespace WPF.Sample.ViewModelLayer
             }
         }
 
+        public ObservableCollection<string> Suppliers
+        {
+            get { return _suppliers; }
+            set
+            {
+                _suppliers = value;
+                RaisePropertyChanged("Suppliers");
+            }
+        }
+
         public virtual void LoadVouchers()
         {
             SampleDbContext db = null;
@@ -35,6 +46,7 @@ namespace WPF.Sample.ViewModelLayer
             {
                 db = new SampleDbContext();
                 Vouchers = new ObservableCollection<VoucherMaster>(db.VoucherMaster.Include(v => v.PaymentDetails).ToList());
+                Suppliers = new ObservableCollection<string>(Vouchers.Select(v => v.RecipientName).OrderBy(v => v).Distinct().ToList());
             }
             catch (Exception ex)
             {
