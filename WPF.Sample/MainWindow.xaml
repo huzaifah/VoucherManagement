@@ -62,7 +62,7 @@
             </StackPanel>
         </Border>
 
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1">
             <Grid Grid.Row="1"
           Panel.ZIndex="1"
           Name="contentArea"

@@ -48,6 +48,17 @@ namespace WPF.Sample.DataLayer.EntityClasses
             }
         }
 
+        // property to cater for sorting voucher based on date representation
+        [NotMapped]
+        public DateTime VoucherInDate
+        {
+            get
+            {
+                var voucherDate = VoucherNo.Split('/');
+                return new DateTime(Convert.ToInt32(voucherDate[1]), Convert.ToInt32(voucherDate[2]), 1).AddSeconds(Convert.ToDouble(voucherDate[3]));
+            }
+        }
+
         [NotMapped]
         public string CashChequeInfo
         {

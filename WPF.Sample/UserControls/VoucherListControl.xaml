@@ -9,7 +9,10 @@
              Width="1250"
              d:DesignHeight="450" d:DesignWidth="800">
 
-        <ListView Name="lvVouchers" Height="675" MaxHeight="675" Focusable="False" ScrollViewer.VerticalScrollBarVisibility="Visible" ItemsSource="{Binding Path=Vouchers}" SelectionChanged="lvVouchers_SelectionChanged">
+    <ListView Name="lvVouchers" HorizontalAlignment="Left" Width="1180" Height="675" VerticalContentAlignment="Top"  
+              ScrollViewer.HorizontalScrollBarVisibility="Visible"
+              ScrollViewer.VerticalScrollBarVisibility="Visible"
+              ScrollViewer.CanContentScroll="False" Focusable="False" ItemsSource="{Binding Path=Vouchers}" SelectionChanged="lvVouchers_SelectionChanged">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Edit" Width="Auto">
@@ -22,7 +25,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="100" DisplayMemberBinding="{Binding Path=VoucherNo}">
-                        <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="VoucherNo" Click="lvVoucherColumnHeader_Click">Voucher No</GridViewColumnHeader>
+                    <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="VoucherInDate" Click="lvVoucherColumnHeader_Click">Voucher No</GridViewColumnHeader>
                     </GridViewColumn>
                     <GridViewColumn Width="200" DisplayMemberBinding="{Binding Path=RecipientName}">
                         <GridViewColumnHeader HorizontalContentAlignment="Left" Tag="RecipientName" Click="lvVoucherColumnHeader_Click">Recipient Name</GridViewColumnHeader>
