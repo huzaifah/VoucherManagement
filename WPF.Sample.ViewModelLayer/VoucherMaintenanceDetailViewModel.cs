@@ -349,7 +349,7 @@ namespace WPF.Sample.ViewModelLayer
             var db = new SampleDbContext();
 
             // get vouchers from the current month
-            var lastVoucherInTheGivenMonth = db.VoucherMaster.Where(v => v.PaymentDate.Month == monthInNumeric)
+            var lastVoucherInTheGivenMonth = db.VoucherMaster.Where(v => v.PaymentDate.Month == monthInNumeric && v.PaymentDate.Year == year)
                 .OrderByDescending(v => v.CreatedOn).FirstOrDefault();
 
             if (lastVoucherInTheGivenMonth == null)
